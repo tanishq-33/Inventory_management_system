@@ -13,56 +13,71 @@ const Signin = () => {
 
   const handleSignIn = async (e) => {
     e.preventDefault();
-    const { session, error } = await signInUser(email, password); // Use your signIn function
+    setLoading(true);
+    setError(null);
 
-    if (error) {
-      setError(error); // Set the error message if sign-in fails
+    try {
+      const { session, error } = await signInUser(email, password);
 
-      // Set a timeout to clear the error message after a specific duration (e.g., 3 seconds)
-      setTimeout(() => {
+      if (error) {
+        setError(error);
+        setTimeout(() => setError(""), 3000);
+        return;
+      }
+
+      if (session) {
         setError("");
-      }, 3000); // 3000 milliseconds = 3 seconds
-    } else {
-      // Redirect or perform any necessary actions after successful sign-in
-      navigate("/dashboard");
-    }
-
-    if (session) {
-      closeModal();
-      setError(""); // Reset the error when there's a session
+        navigate("/dashboard");
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div>
-      <form onSubmit={handleSignIn} className="max-w-md m-auto pt-24">
-        <h2 className="font-bold pb-2">Sign in</h2>
-        <p>
-          Don't have an account yet? <Link to="/signup">Sign up</Link>
-        </p>
-        <div className="flex flex-col py-4">
-          {/* <label htmlFor="Email">Email</label> */}
+    <div className="min-h-screen flex items-center justify-center">
+      <form
+        onSubmit={handleSignIn}
+        className="bg-gray rounded-lg shadow-lg w-full max-w-md p-8"
+      >
+        <h2 className="text-2xl font-bold mb-1">Log in</h2>
+
+        <div className="mb-4">
           <input
             onChange={(e) => setEmail(e.target.value)}
-            className="p-3 mt-2"
+            className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-teal-300"
             type="email"
             name="email"
             id="email"
-            placeholder="Email"
+            placeholder="Username"
+            required
           />
         </div>
-        <div className="flex flex-col py-4">
-          {/* <label htmlFor="Password">Password</label> */}
+
+        <div className="mb-6">
           <input
             onChange={(e) => setPassword(e.target.value)}
-            className="p-3 mt-2"
+            className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-teal-300"
             type="password"
             name="password"
             id="password"
             placeholder="Password"
+            required
           />
         </div>
-        <button className="w-full mt-4">Sign In</button>
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full bg-teal-500 hover:bg-teal-600 text-white py-3 rounded font-medium disabled:opacity-60"
+        >
+          {loading ? "Signing in..." : "Log in"}
+        </button>
+
+        <div className="text-center mt-4 text-sm text-gray-500">
+          or, <Link to="/signup" className="text-teal-600 hover:underline">sign up</Link>
+        </div>
+
         {error && <p className="text-red-600 text-center pt-4">{error}</p>}
       </form>
     </div>

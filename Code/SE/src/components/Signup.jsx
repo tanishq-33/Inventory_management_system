@@ -14,54 +14,72 @@ const Signup = () => {
   const handleSignUp = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setError(null);
 
     try {
-      const result = await signUpNewUser(email, password); // Call context function
+      const result = await signUpNewUser(email, password);
 
-      if (result.success) {
-        navigate("/dashboard"); // Navigate to dashboard on success
+      if (result?.success) {
+        navigate("/dashboard");
       } else {
-        setError(result.error.message); // Show error message on failure
+        setError(result?.error?.message || "Signup failed");
       }
     } catch (err) {
-      setError("An unexpected error occurred."); // Catch unexpected errors
+      setError("An unexpected error occurred.");
     } finally {
-      setLoading(false); // End loading state
+      setLoading(false);
     }
   };
 
   return (
-    <div>
-      <form onSubmit={handleSignUp} className="max-w-md m-auto pt-24">
-        <h2 className="font-bold pb-2">Sign up today!</h2>
-        <p>
-          Already have an account? <Link to="/">Sign in</Link>
-        </p>
-        <div className="flex flex-col py-4">
-          {/* <label htmlFor="Email">Email</label> */}
+    <div className="min-h-screen  flex items-center justify-center">
+      <form
+        onSubmit={handleSignUp}
+        className="bg-grey rounded-lg shadow-lg w-full max-w-md p-8"
+      >
+        <h2 className="pb-4 text-2xl font-bold mb-1">Sign up</h2>
+
+        <div className="mb-4">
           <input
             onChange={(e) => setEmail(e.target.value)}
-            className="p-3 mt-2"
+            value={email}
+            className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-teal-300"
             type="email"
             name="email"
             id="email"
             placeholder="Email"
+            required
           />
         </div>
-        <div className="flex flex-col py-4">
-          {/* <label htmlFor="Password">Password</label> */}
+
+        <div className="mb-6">
           <input
             onChange={(e) => setPassword(e.target.value)}
-            className="p-3 mt-2"
+            value={password}
+            className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-teal-300"
             type="password"
             name="password"
             id="password"
             placeholder="Password"
+            required
           />
         </div>
-        <button type="submit" disabled={loading} className="w-full mt-4">
-          Sign Up
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full bg-teal-500 hover:bg-teal-600 text-white py-3 rounded font-medium disabled:opacity-60"
+        >
+          {loading ? "Creating account..." : "Sign up"}
         </button>
+
+        <p className="pt-4 text-sm text-gray-600 mb-6">
+          Already have an account?{" "}
+          <Link to="/" className="text-teal-600 hover:underline">
+            Sign in
+          </Link>
+        </p>
+
         {error && <p className="text-red-600 text-center pt-4">{error}</p>}
       </form>
     </div>
