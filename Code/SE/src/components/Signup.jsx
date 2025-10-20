@@ -18,14 +18,28 @@ const Signup = () => {
 
     try {
       const result = await signUpNewUser(email, password);
+      console.log("signUpNewUser result:", result);
 
-      if (result?.success) {
+      // If the auth backend returns a session on sign up, it's an auto-login.
+      // Only navigate automatically if a session exists (explicit auto-login).
+      if (result?.session || result?.user && result?.session) {
         navigate("/dashboard");
-      } else {
-        setError(result?.error?.message || "Signup failed");
+        return;
       }
+
+      // If signup succeeded but no session returned, show message instead of auto-login
+      if (result?.user || result?.success) {
+        setError(null);
+        // show success message instead of navigation
+        setError("Account created. Please check your email to confirm (if required) and then sign in.");
+        return;
+      }
+
+      // fall back to error
+      setError(result?.error?.message || result?.error || "Signup failed");
     } catch (err) {
-      setError("An unexpected error occurred.");
+      console.error("Signup error:", err);
+      setError(err?.message || "An unexpected error occurred.");
     } finally {
       setLoading(false);
     }

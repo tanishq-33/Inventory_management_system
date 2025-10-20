@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import sign from "../components/Signin";
 import { useNavigate } from "react-router-dom";
 import { UserAuth } from "../context/AuthContext";
 import Header from '../components/Header';
@@ -25,7 +26,7 @@ const Dashboard = () => {
   };
 
   // If user not signed in, show Login (or redirect)
-  if (!session) return <Login />;
+  if (!session) return <sign />;
 
   // AppContent logic merged here
   const [activeTab, setActiveTab] = useState("dashboard");

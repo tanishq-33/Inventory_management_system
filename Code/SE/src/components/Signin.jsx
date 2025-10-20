@@ -17,66 +17,57 @@ const Signin = () => {
     setError(null);
 
     try {
-      const { session, error } = await signInUser(email, password);
+      const result = await signInUser(email, password);
+      console.log("signInUser result:", result);
 
-      if (error) {
-        setError(error);
-        setTimeout(() => setError(""), 3000);
+      // handle common return shapes:
+      // 1) { success: true, ... }
+      // 2) { session: {...} } (supabase style)
+      // 3) { user: {...}, session: {...} }
+      // 4) { error: {...} }
+      const ok =
+        result?.success === true ||
+        Boolean(result?.session) ||
+        Boolean(result?.user);
+
+      if (ok) {
+        navigate("/dashboard");
         return;
       }
 
-      if (session) {
-        setError("");
-        navigate("/dashboard");
-      }
+      // fall back to error messages
+      const message =
+        result?.error?.message || result?.error || "Sign in failed";
+      setError(message);
+    } catch (err) {
+      console.error("Sign in error:", err);
+      setError(err?.message || "Unexpected sign in error");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <form
-        onSubmit={handleSignIn}
-        className="bg-gray rounded-lg shadow-lg w-full max-w-md p-8"
-      >
+    <div className="min-h-screen  flex items-center justify-center">
+      <form onSubmit={handleSignIn} className="bg-gray rounded-lg shadow-lg w-full max-w-md p-8">
         <h2 className="text-2xl font-bold mb-1">Log in</h2>
+        <p className="text-sm text-gray-600 mb-6">
+          Don't have an account yet? <Link className="text-teal-600 hover:underline" to="/signup">Sign up</Link>
+        </p>
 
         <div className="mb-4">
-          <input
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-teal-300"
-            type="email"
-            name="email"
-            id="email"
-            placeholder="Username"
-            required
-          />
+          <input onChange={(e) => setEmail(e.target.value)} value={email}
+            className="w-full p-3 border border-gray-300 rounded" type="email" name="email" placeholder="Email" required />
         </div>
 
         <div className="mb-6">
-          <input
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-teal-300"
-            type="password"
-            name="password"
-            id="password"
-            placeholder="Password"
-            required
-          />
+          <input onChange={(e) => setPassword(e.target.value)} value={password}
+            className="w-full p-3 border border-gray-300 rounded" type="password" name="password" placeholder="Password" required />
         </div>
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full bg-teal-500 hover:bg-teal-600 text-white py-3 rounded font-medium disabled:opacity-60"
-        >
+        <button type="submit" disabled={loading} className="w-full bg-teal-500 text-white py-3 rounded">
           {loading ? "Signing in..." : "Log in"}
         </button>
-
-        <div className="text-center mt-4 text-sm text-gray-500">
-          or, <Link to="/signup" className="text-teal-600 hover:underline">sign up</Link>
-        </div>
 
         {error && <p className="text-red-600 text-center pt-4">{error}</p>}
       </form>
