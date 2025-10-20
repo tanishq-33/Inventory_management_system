@@ -51,9 +51,6 @@ const Signin = () => {
     <div className="min-h-screen  flex items-center justify-center">
       <form onSubmit={handleSignIn} className="bg-gray rounded-lg shadow-lg w-full max-w-md p-8">
         <h2 className="text-2xl font-bold mb-1">Log in</h2>
-        <p className="text-sm text-gray-600 mb-6">
-          Don't have an account yet? <Link className="text-teal-600 hover:underline" to="/signup">Sign up</Link>
-        </p>
 
         <div className="mb-4">
           <input onChange={(e) => setEmail(e.target.value)} value={email}
@@ -65,10 +62,15 @@ const Signin = () => {
             className="w-full p-3 border border-gray-300 rounded" type="password" name="password" placeholder="Password" required />
         </div>
 
+        <p className="text-sm text-gray-600 mb-6">
+          Don't have an account yet? <Link className="text-teal-600 hover:underline" to="/signup">Sign up</Link>
+        </p>
+
         <button type="submit" disabled={loading} className="w-full bg-teal-500 text-white py-3 rounded">
           {loading ? "Signing in..." : "Log in"}
         </button>
 
+        
         {error && <p className="text-red-600 text-center pt-4">{error}</p>}
       </form>
     </div>
